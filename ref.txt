@@ -20,3 +20,55 @@ Adicionar o botão de aprovação e estabelecer sua interação com a validaçã
 Adicionar estilização adequada para a exibição das perguntas, switches e botão de aprovação.
 Testar a funcionalidade dos switches, validação do botão de aprovação e armazenamento das opções selecionadas.
 Implementar testes unitários para validar o comportamento dos componentes e da lógica de validação.
+
+Caso de Teste: Carregamento das Perguntas
+Descrição: Verificar se a lista de perguntas está sendo carregada corretamente no front-end.
+
+Etapas:
+
+Iniciar a aplicação.
+
+Verificar se a lista de perguntas está sendo exibida na tela principal.
+
+Verificar se todas as perguntas estão presentes e com os dados corretos.
+
+Caso de Teste: Alternância do Switch
+
+Descrição: Testar a funcionalidade de alternar o estado do switch para cada pergunta.
+
+Etapas:
+
+Iniciar a aplicação.
+
+Localizar uma pergunta com o switch.
+
+Clicar no switch para alternar o seu estado.
+
+Verificar se o estado do switch é atualizado corretamente.
+
+Caso de Teste: Validação do Botão de Aprovação
+
+Descrição: Verificar se o botão de aprovação é desabilitado se alguma pergunta estiver sem resposta.
+
+Etapas:
+
+Iniciar a aplicação.
+
+Verificar se todas as perguntas estão com o switch marcado como respondido.
+
+Desmarcar o switch de uma pergunta.
+
+Verificar se o botão de aprovação está desabilitado.
+
+Caso de Teste: Envio das Respostas
+
+Descrição: Testar o envio das respostas ao acionar o botão de aprovação.
+
+Etapas:
+
+Iniciar a aplicação.
+Responder todas as perguntas marcando os switches.
+Clicar no botão de aprovação.
+Verificar se as respostas são enviadas corretamente.
+Verificar se é exibida uma mensagem de confirmação após o envio.
+Lembre-se de adaptar esses casos de teste de acordo com a natureza estática do desenvolvimento e os requisitos específicos do seu projeto.
