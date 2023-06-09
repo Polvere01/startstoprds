@@ -1,0 +1,22 @@
+Contexto: Desenvolvimento da tela de perguntas com switches estáticos e botão de aprovação.
+
+Requisitos atualizados:
+
+Carregar uma lista de perguntas na tela.
+Exibir cada pergunta junto com um switch de opções.
+As perguntas e opções do switch são estáticas, não requerem interação com o servidor.
+Ao alternar o switch, a opção selecionada deve ser armazenada localmente.
+O botão de aprovação do checklist só deve ser ativado quando todos os switches de perguntas estiverem marcados como positivo.
+
+
+Fluxo de desenvolvimento:
+
+Criar o componente de tela "PerguntasChecklist".
+Criar um serviço para carregar a lista de perguntas (simulação estática para o refinamento).
+Exibir as perguntas na tela, juntamente com um switch para cada pergunta.
+Implementar a lógica para alternar o switch e armazenar a opção selecionada no estado local.
+Validar o estado dos switches a cada alteração e habilitar o botão de aprovação somente se todos estiverem marcados como positivo.
+Adicionar o botão de aprovação e estabelecer sua interação com a validação dos switches.
+Adicionar estilização adequada para a exibição das perguntas, switches e botão de aprovação.
+Testar a funcionalidade dos switches, validação do botão de aprovação e armazenamento das opções selecionadas.
+Implementar testes unitários para validar o comportamento dos componentes e da lógica de validação.
