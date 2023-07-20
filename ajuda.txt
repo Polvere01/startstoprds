@@ -1,31 +1,35 @@
 import pandas as pd
 
+def garantir_tamanho_dataframe(df, min_linhas, min_colunas):
+    """Garante que o DataFrame tenha pelo menos min_linhas e min_colunas."""
+    while len(df.columns) < min_colunas:
+        df[len(df.columns)] = None
+    while len(df) < min_linhas:
+        df.loc[len(df)] = [None] * len(df.columns)
+    return df
+
 def ler_excel(arquivo, sheet_name):
-    # Lê um arquivo Excel e retorna um DataFrame.# 
     return pd.read_excel(arquivo, sheet_name=sheet_name, header=None, engine='openpyxl')
 
 def salvar_excel(df, arquivo, sheet_name):
-    # Salva um DataFrame em um arquivo Excel.# 
     df.to_excel(arquivo, sheet_name=sheet_name, index=False, header=None, engine='openpyxl')
 
-def copiar_valor_para_destino(df_fonte, df_destino, linha_origem, coluna_origem, linha_destino, coluna_destino):
-    # Copia um valor do df_fonte para df_destino e limpa o valor original.# 
-    valor_copiado = df_fonte.iloc[linha_origem, coluna_origem]
-    df_fonte.iloc[linha_origem, coluna_origem] = ''
+def copiar_bloco_para_destino(df_fonte, df_destino, inicio_linha_origem, fim_linha_origem, inicio_coluna_origem, fim_coluna_origem, inicio_linha_destino, inicio_coluna_destino):
+    bloco_copiado = df_fonte.iloc[inicio_linha_origem:fim_linha_origem, inicio_coluna_origem:fim_coluna_origem].copy()
+    print("Bloco copiado:")
+    print(bloco_copiado)
+    
+    df_fonte.iloc[inicio_linha_origem:fim_linha_origem, inicio_coluna_origem:fim_coluna_origem] = ''
+    
+    # Garante que o DataFrame de destino tenha o tamanho necessário
+    df_destino = garantir_tamanho_dataframe(df_destino, inicio_linha_destino + bloco_copiado.shape[0], inicio_coluna_destino + bloco_copiado.shape[1])
+    
+    # Copia o bloco para o df_destino
+    df_destino.iloc[inicio_linha_destino:inicio_linha_destino + bloco_copiado.shape[0], inicio_coluna_destino:inicio_coluna_destino + bloco_copiado.shape[1]] = bloco_copiado.values
 
-    # Se df_destino estiver vazio, defina suas colunas com base em df_fonte
-    if df_destino.empty:
-        df_destino = pd.DataFrame(columns=df_fonte.columns)
+    print("\nDataFrame destino após colar:")
+    print(df_destino)
 
-    # Garante que df_destino tenha linhas suficientes
-    while len(df_destino) <= linha_destino:
-        df_destino.loc[len(df_destino)] = [None] * df_destino.shape[1]
-
-    # Garante que df_destino tenha colunas suficientes
-    while df_destino.shape[1] <= coluna_destino:
-        df_destino[df_destino.shape[1]] = None
-
-    df_destino.iloc[linha_destino, coluna_destino] = valor_copiado
     return df_fonte, df_destino
 
 def main():
@@ -37,7 +41,7 @@ def main():
     df_fonte = ler_excel(arquivo_fonte, nome_da_aba_fonte)
     df_destino = ler_excel(arquivo_destino, nome_da_aba_destino)
 
-    df_fonte, df_destino = copiar_valor_para_destino(df_fonte, df_destino, 1, 0, 2, 0)
+    df_fonte, df_destino = copiar_bloco_para_destino(df_fonte, df_destino, 1, 15, 0, 11, 3, 10)  # Ajustei para colar na coluna K
 
     salvar_excel(df_fonte, arquivo_fonte, nome_da_aba_fonte)
     salvar_excel(df_destino, arquivo_destino, nome_da_aba_destino)
