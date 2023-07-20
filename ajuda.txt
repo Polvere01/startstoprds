@@ -1,8 +1,44 @@
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+import pandas as pd
 
-spring.h2.console.enabled=true
-spring.h2.console.path=/h2-console
+def ler_excel(arquivo):
+    # Lê um arquivo Excel e retorna um DataFrame.# 
+    return pd.read_excel(arquivo, header=None, engine='openpyxl')
+
+def salvar_excel(df, arquivo):
+    # Salva um DataFrame em um arquivo Excel.# 
+    df.to_excel(arquivo, index=False, header=None, engine='openpyxl')
+
+def copiar_valor_para_destino(df_fonte, df_destino, linha_origem, coluna_origem, linha_destino, coluna_destino):
+    # Copia um valor do df_fonte para df_destino e limpa o valor original.# 
+    valor_copiado = df_fonte.iloc[linha_origem, coluna_origem]
+    df_fonte.iloc[linha_origem, coluna_origem] = ''
+
+    # Se df_destino estiver vazio, defina suas colunas com base em df_fonte
+    if df_destino.empty:
+        df_destino = pd.DataFrame(columns=df_fonte.columns)
+
+    # Garante que df_destino tenha linhas suficientes
+    while len(df_destino) <= linha_destino:
+        df_destino.loc[len(df_destino)] = [None] * df_destino.shape[1]
+
+    # Garante que df_destino tenha colunas suficientes
+    while df_destino.shape[1] <= coluna_destino:
+        df_destino[df_destino.shape[1]] = None
+
+    df_destino.iloc[linha_destino, coluna_destino] = valor_copiado
+    return df_fonte, df_destino
+
+def main():
+    arquivo_fonte = 'fonte.xlsx'
+    arquivo_destino = 'destino.xlsx'
+
+    df_fonte = ler_excel(arquivo_fonte)
+    df_destino = ler_excel(arquivo_destino)
+
+    df_fonte, df_destino = copiar_valor_para_destino(df_fonte, df_destino, 1, 0, 2, 0)
+
+    salvar_excel(df_fonte, arquivo_fonte)
+    salvar_excel(df_destino, arquivo_destino)
+
+if __name__ == '__main__':
+    main()
