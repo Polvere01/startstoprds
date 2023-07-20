@@ -24,7 +24,18 @@ def ler_excel(arquivo, sheet_name):
             data.append(worksheet.row_values(row))
         return pd.DataFrame(data)
 
+def convert_xlsb_to_xlsx(xlsb_file):
+    xlsx_file = xlsb_file.replace('.xlsb', '.xlsx')
+    with open_xlsb(xlsb_file) as wb:
+        with wb.get_sheet(1) as sheet:
+            data = [[cell.v for cell in row] for row in sheet.rows()]
+    df = pd.DataFrame(data)
+    df.to_excel(xlsx_file, index=False, engine='openpyxl')
+    return xlsx_file
+
 def salvar_excel(df, arquivo, sheet_name):
+    if arquivo.endswith('.xlsb'):
+        arquivo = convert_xlsb_to_xlsx(arquivo)
     df.to_excel(arquivo, sheet_name=sheet_name, index=False, header=None, engine='openpyxl')
 
 def copiar_bloco_para_destino(df_fonte, df_destino, inicio_linha_origem, fim_linha_origem, inicio_coluna_origem, fim_coluna_origem, inicio_linha_destino, inicio_coluna_destino):
