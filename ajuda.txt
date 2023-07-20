@@ -1,4 +1,6 @@
 import pandas as pd
+import xlrd
+from pyxlsb import open_workbook as open_xlsb
 
 def garantir_tamanho_dataframe(df, min_linhas, min_colunas):
     """Garante que o DataFrame tenha pelo menos min_linhas e min_colunas."""
@@ -9,7 +11,18 @@ def garantir_tamanho_dataframe(df, min_linhas, min_colunas):
     return df
 
 def ler_excel(arquivo, sheet_name):
-    return pd.read_excel(arquivo, sheet_name=sheet_name, header=None, engine='openpyxl')
+    if arquivo.endswith('.xlsb'):
+        with open_xlsb(arquivo) as wb:
+            with wb.get_sheet(1) as sheet:
+                data = [[cell.v for cell in row] for row in sheet.rows()]
+        return pd.DataFrame(data)
+    else:
+        workbook = xlrd.open_workbook(arquivo)
+        worksheet = workbook.sheet_by_name(sheet_name)
+        data = []
+        for row in range(worksheet.nrows):
+            data.append(worksheet.row_values(row))
+        return pd.DataFrame(data)
 
 def salvar_excel(df, arquivo, sheet_name):
     df.to_excel(arquivo, sheet_name=sheet_name, index=False, header=None, engine='openpyxl')
@@ -33,8 +46,8 @@ def copiar_bloco_para_destino(df_fonte, df_destino, inicio_linha_origem, fim_lin
     return df_fonte, df_destino
 
 def main():
-    arquivo_fonte = 'fonte.xlsx'
-    arquivo_destino = 'destino.xlsx'
+    arquivo_fonte = 'fonte.xlsb'  # ou 'fonte.xls'
+    arquivo_destino = 'destino.xls'
     nome_da_aba_fonte = 'AJUSTE GERADOR'  
     nome_da_aba_destino = 'Faturas_Braile_-_Base (16)'  
 
