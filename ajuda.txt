@@ -1,12 +1,12 @@
 import pandas as pd
 
-def ler_excel(arquivo):
+def ler_excel(arquivo, sheet_name):
     # Lê um arquivo Excel e retorna um DataFrame.# 
-    return pd.read_excel(arquivo, header=None, engine='openpyxl')
+    return pd.read_excel(arquivo, sheet_name=sheet_name, header=None, engine='openpyxl')
 
-def salvar_excel(df, arquivo):
+def salvar_excel(df, arquivo, sheet_name):
     # Salva um DataFrame em um arquivo Excel.# 
-    df.to_excel(arquivo, index=False, header=None, engine='openpyxl')
+    df.to_excel(arquivo, sheet_name=sheet_name, index=False, header=None, engine='openpyxl')
 
 def copiar_valor_para_destino(df_fonte, df_destino, linha_origem, coluna_origem, linha_destino, coluna_destino):
     # Copia um valor do df_fonte para df_destino e limpa o valor original.# 
@@ -31,14 +31,16 @@ def copiar_valor_para_destino(df_fonte, df_destino, linha_origem, coluna_origem,
 def main():
     arquivo_fonte = 'fonte.xlsx'
     arquivo_destino = 'destino.xlsx'
+    nome_da_aba_fonte = 'AJUSTE GERADOR'  
+    nome_da_aba_destino = 'Faturas_Braile_-_Base (16)'  
 
-    df_fonte = ler_excel(arquivo_fonte)
-    df_destino = ler_excel(arquivo_destino)
+    df_fonte = ler_excel(arquivo_fonte, nome_da_aba_fonte)
+    df_destino = ler_excel(arquivo_destino, nome_da_aba_destino)
 
     df_fonte, df_destino = copiar_valor_para_destino(df_fonte, df_destino, 1, 0, 2, 0)
 
-    salvar_excel(df_fonte, arquivo_fonte)
-    salvar_excel(df_destino, arquivo_destino)
+    salvar_excel(df_fonte, arquivo_fonte, nome_da_aba_fonte)
+    salvar_excel(df_destino, arquivo_destino, nome_da_aba_destino)
 
 if __name__ == '__main__':
     main()
