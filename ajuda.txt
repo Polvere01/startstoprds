@@ -1,38 +1,6 @@
-import py7zr
-import shutil
-import os
+  # Extraia o número do lote do nome do arquivo
+    lote_number = os.path.basename(input_file).split('_')[-1].replace('.7z', '')
 
-def convert_7z_to_zip(input_file, output_dir):
-    output_file = os.path.join(output_dir, os.path.basename(input_file).replace('.7z', '.zip'))
+ # Defina o nome do arquivo de saída de acordo com o novo padrão
+    output_file = os.path.join(output_dir, f'FATURA_COBRANCA_ATRAZOCURTO_I_{lote_number}.zip')
     
-    # Verifique se o arquivo de entrada existe
-    if not os.path.exists(input_file):
-        print(f"O arquivo {input_file} não foi encontrado.")
-        return
-
-    # Crie um diretório temporário para descomprimir os arquivos
-    temp_dir = "temp_dir_for_conversion"
-    if not os.path.exists(temp_dir):
-        os.makedirs(temp_dir)
-
-    # Descomprima o arquivo .7z
-    with py7zr.SevenZipFile(input_file, mode='r') as archive:
-        archive.extractall(path=temp_dir)
-
-    # Comprima os arquivos extraídos em .zip
-    shutil.make_archive(output_file.replace(".zip", ""), 'zip', temp_dir)
-
-    # Remova o diretório temporário
-    shutil.rmtree(temp_dir)
-
-    print(f"Conversão completa: {output_file} criado com sucesso.")
-
-if __name__ == "__main__":
-    input_directory = input("Digite o diretório contendo os arquivos .7z: ")
-    output_directory = input("Digite o diretório de saída para os arquivos .zip: ")
-
-    # Lista todos os arquivos .7z no diretório de entrada
-    files_to_convert = [os.path.join(input_directory, f) for f in os.listdir(input_directory) if f.endswith('.7z')]
-
-    for file in files_to_convert:
-        convert_7z_to_zip(file, output_directory)
