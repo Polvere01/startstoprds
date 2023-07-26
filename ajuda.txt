@@ -1,4 +1,16 @@
-   # Detecta a pasta de origem (FAC ou Pdf) e define o identificador adequado
-    folder_name = os.path.basename(os.path.dirname(input_file))
-    identifier = "_I_" if folder_name == "FAC" else "_D_" if folder_name == "Pdf" else "_UNKNOWN_"
-  
+    # Baseado no nome do arquivo, decidir se é um arquivo "lote" ou não
+    file_name = os.path.basename(input_file)
+    
+    if "lote_" in file_name:
+        # Extraia o número do lote do nome do arquivo
+        lote_number = file_name.split('_')[-1].replace('.7z', '')
+        
+        # Detecta a pasta de origem (FAC ou Pdf) e define o identificador adequado
+        folder_name = os.path.basename(os.path.dirname(input_file))
+        identifier = "_I_" if folder_name == "FAC" else "_D_" if folder_name == "Pdf" else "_UNKNOWN_"
+        
+        # Defina o nome do arquivo de saída de acordo com o novo padrão
+        output_file = os.path.join(output_dir, f'FATURA_COBRANCA_ATRAZOCURTO{identifier}{lote_number}.zip')
+    else:
+        output_file = os.path.join(output_dir, file_name.replace('.7z', '.zip'))
+   
