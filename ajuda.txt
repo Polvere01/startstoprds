@@ -1,6 +1,4 @@
-  # Extraia o número do lote do nome do arquivo
-    lote_number = os.path.basename(input_file).split('_')[-1].replace('.7z', '')
-
- # Defina o nome do arquivo de saída de acordo com o novo padrão
-    output_file = os.path.join(output_dir, f'FATURA_COBRANCA_ATRAZOCURTO_I_{lote_number}.zip')
-    
+   # Detecta a pasta de origem (FAC ou Pdf) e define o identificador adequado
+    folder_name = os.path.basename(os.path.dirname(input_file))
+    identifier = "_I_" if folder_name == "FAC" else "_D_" if folder_name == "Pdf" else "_UNKNOWN_"
+  
