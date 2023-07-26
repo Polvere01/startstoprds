@@ -2,7 +2,9 @@ import py7zr
 import shutil
 import os
 
-def convert_7z_to_zip(input_file, output_file):
+def convert_7z_to_zip(input_file, output_dir):
+    output_file = os.path.join(output_dir, os.path.basename(input_file).replace('.7z', '.zip'))
+    
     # Verifique se o arquivo de entrada existe
     if not os.path.exists(input_file):
         print(f"O arquivo {input_file} não foi encontrado.")
@@ -26,7 +28,11 @@ def convert_7z_to_zip(input_file, output_file):
     print(f"Conversão completa: {output_file} criado com sucesso.")
 
 if __name__ == "__main__":
-    input_path = input("Digite o caminho do arquivo .7z: ")
-    output_path = input("Digite o caminho de saída do arquivo .zip: ")
+    input_directory = input("Digite o diretório contendo os arquivos .7z: ")
+    output_directory = input("Digite o diretório de saída para os arquivos .zip: ")
 
-    convert_7z_to_zip(input_path, output_path)
+    # Lista todos os arquivos .7z no diretório de entrada
+    files_to_convert = [os.path.join(input_directory, f) for f in os.listdir(input_directory) if f.endswith('.7z')]
+
+    for file in files_to_convert:
+        convert_7z_to_zip(file, output_directory)
