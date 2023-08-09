@@ -1,43 +1,11 @@
-import os
-from datetime import datetime
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-def rename_file(input_file, output_dir):
-    # Baseado no nome do arquivo, decidir se é um arquivo "lote" ou não
-    file_name = os.path.basename(input_file)
+@JsonPropertyOrder({ "id", "nome", "idade", "endereco" })
+public class Pessoa {
+    private Long id;
+    private String nome;
+    private int idade;
+    private String endereco;
     
-    if "lote_" in file_name:
-        # Extraia o número do lote do nome do arquivo
-        lote_number = file_name.split('_')[-1].replace('.zip', '')
-        
-        # Detecta a pasta de origem (FAC ou Pdf) e define o identificador adequado
-        folder_name = os.path.basename(os.path.dirname(input_file))
-        identifier = "_I_" if folder_name == "FAC" else "_D_" if folder_name == "Pdf" else "_UNKNOWN_"
-        
-        # Defina o nome do arquivo de saída de acordo com o novo padrão
-        new_file_name = f'FATURA_COBRANCA_ATRAZOCURTO{identifier}{lote_number}.zip'
-    else:
-        new_file_name = file_name  # Mantenha o nome original se não começar com "lote_"
-
-    new_path = os.path.join(output_dir, new_file_name)
-    
-    # Renomeie/mova o arquivo para o novo local
-    os.rename(input_file, new_path)
-    
-    print(f"Arquivo renomeado: {new_path}.")
-
-if __name__ == "__main__":
-    # Cria um diretório de entrada com base na data de hoje no formato ddmmaaaa
-    today = datetime.now().strftime('%d%m%Y')
-    input_directory = os.path.join("Caminho/para/sua/pasta/base", today)  # ajuste "Caminho/para/sua/pasta/base" conforme necessário
-
-    specified_output_directory = input("Digite o diretório onde os arquivos .zip renomeados devem ser salvos: ")
-
-    # Garante que o diretório de saída especificado existe
-    if not os.path.exists(specified_output_directory):
-        os.makedirs(specified_output_directory)
-
-    # Lista todos os arquivos .zip no diretório de entrada
-    files_to_rename = [os.path.join(input_directory, f) for f in os.listdir(input_directory) if f.endswith('.zip')]
-
-    for file in files_to_rename:
-        rename_file(file, specified_output_directory)
+    // getters e setters
+}
