@@ -1,11 +1,33 @@
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import csv
+import uuid
+import yaml
 
-@JsonPropertyOrder({ "id", "nome", "idade", "endereco" })
-public class Pessoa {
-    private Long id;
-    private String nome;
-    private int idade;
-    private String endereco;
-    
-    // getters e setters
-}
+def csv_to_yaml(csv_filename, yaml_filename):
+    with open(csv_filename, mode='r', encoding='utf-8') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=';')  # Especificando o delimitador
+        
+        # Pular o cabeçalho
+        next(csv_reader)
+        
+        documentos = []
+        
+        for row in csv_reader:
+            documento = {
+                'id': str(uuid.uuid4()),
+                'enunciado': row[2],  # Terceira coluna
+                'tipo': 'DOCUMENTO',
+                'tipo_resposta': 'DOCUMENTO',
+                'descrição_detalhada': row[3],  # Quarta coluna
+                'observacao': row[4],  # Quinta coluna
+                'ativa': True,
+                'oculta': False,
+                'opcional': row[5],  # Sexta coluna
+                'familia_cobertura': row[0]  # Primeira coluna
+            }
+            documentos.append(documento)
+        
+        with open(yaml_filename, mode='w', encoding='utf-8') as yaml_file:
+            yaml.dump({'documentos': documentos}, yaml_file, default_flow_style=False, allow_unicode=True)
+
+# Exemplo de uso:
+csv_to_yaml('seu_arquivo.csv', 'saida.yaml')
