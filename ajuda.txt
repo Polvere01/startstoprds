@@ -3,12 +3,11 @@ import uuid
 import yaml
 
 # Função personalizada para adicionar aspas em todos os valores
-def quoted_presenter(dumper, data):
-    return dumper.represent_scalar('tag:yaml.org,2002:str', str(data), style='"')
+def quoted_string_presenter(dumper, data):
+    return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='"')
 
-# Registrar a função personalizada para todos os tipos de dados
-for data_type in [str, int, float, bool]:
-    yaml.add_representer(data_type, quoted_presenter)
+# Registrar a função personalizada apenas para strings
+yaml.add_representer(str, quoted_string_presenter)
 
 def csv_to_yaml(csv_filename, yaml_filename):
     with open(csv_filename, mode='r', encoding='utf-8') as csv_file:
@@ -27,9 +26,9 @@ def csv_to_yaml(csv_filename, yaml_filename):
                 'tipo_resposta': 'DOCUMENTO',
                 'descrição_detalhada': row[3],  # Quarta coluna
                 'observacao': row[4],  # Quinta coluna
-                'ativa': "True",
-                'oculta': "False",
-                'opcional': "True" if row[5].lower() == 'opcional' else "False",  # Convertendo a string para booleano
+                'ativa': True,
+                'oculta': False,
+                'opcional': True if row[5].lower() == 'opcional' else False,  # Convertendo a string para booleano
                 'familia_cobertura': row[0]  # Primeira coluna
             }
             documentos.append(documento)
