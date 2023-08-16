@@ -1,5 +1,6 @@
 import csv
 import uuid
+from collections import OrderedDict
 import yaml
 
 def csv_to_yaml(csv_filename, yaml_filename):
@@ -12,18 +13,19 @@ def csv_to_yaml(csv_filename, yaml_filename):
         documentos = []
         
         for row in csv_reader:
-            documento = {
-                'id': str(uuid.uuid4()),
-                'enunciado': row[2],  # Terceira coluna
-                'tipo': 'DOCUMENTO',
-                'tipo_resposta': 'DOCUMENTO',
-                'descrição_detalhada': row[3],  # Quarta coluna
-                'observacao': row[4],  # Quinta coluna
-                'ativa': True,
-                'oculta': False,
-                'opcional': row[5],  # Sexta coluna
-                'familia_cobertura': row[0]  # Primeira coluna
-            }
+            # Usando OrderedDict para manter a ordem dos campos
+            documento = OrderedDict([
+                ('id', str(uuid.uuid4())),
+                ('enunciado', row[2]),  # Terceira coluna
+                ('tipo', 'DOCUMENTO'),
+                ('tipo_resposta', 'DOCUMENTO'),
+                ('descrição_detalhada', row[3]),  # Quarta coluna
+                ('observacao', row[4]),  # Quinta coluna
+                ('ativa', True),
+                ('oculta', False),
+                ('opcional', row[5]),  # Sexta coluna
+                ('familia_cobertura', row[0])  # Primeira coluna
+            ])
             documentos.append(documento)
         
         with open(yaml_filename, mode='w', encoding='utf-8') as yaml_file:
