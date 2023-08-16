@@ -2,12 +2,19 @@ import csv
 import uuid
 import yaml
 
-# Função personalizada para adicionar aspas em todos os valores
-def quoted_string_presenter(dumper, data):
-    return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='"')
+# Função personalizada para manter a ordem de inserção e adicionar aspas
+def represent_dict_order(dumper, data):
+    return dumper.represent_mapping('tag:yaml.org,2002:map', data.items(), flow_style=False)
 
-# Registrar a função personalizada apenas para strings
-yaml.add_representer(str, quoted_string_presenter)
+# Função personalizada para evitar quebras de linha em strings longas
+def represent_str(dumper, data):
+    if len(data.splitlines()) > 1:  # verifica se há múltiplas linhas
+        return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+    return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+
+# Registrar as funções personalizadas
+yaml.add_representer(dict, represent_dict_order)
+yaml.add_representer(str, represent_str)
 
 def csv_to_yaml(csv_filename, yaml_filename):
     with open(csv_filename, mode='r', encoding='utf-8') as csv_file:
