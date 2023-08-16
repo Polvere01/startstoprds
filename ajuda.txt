@@ -1,7 +1,11 @@
 import csv
 import uuid
-from collections import OrderedDict
 import yaml
+
+# Subclasse para manter a ordem de inserção
+class NoAliasDumper(yaml.Dumper):
+    def ignore_aliases(self, data):
+        return True
 
 def csv_to_yaml(csv_filename, yaml_filename):
     with open(csv_filename, mode='r', encoding='utf-8') as csv_file:
@@ -13,23 +17,22 @@ def csv_to_yaml(csv_filename, yaml_filename):
         documentos = []
         
         for row in csv_reader:
-            # Usando OrderedDict para manter a ordem dos campos
-            documento = OrderedDict([
-                ('id', str(uuid.uuid4())),
-                ('enunciado', row[2]),  # Terceira coluna
-                ('tipo', 'DOCUMENTO'),
-                ('tipo_resposta', 'DOCUMENTO'),
-                ('descrição_detalhada', row[3]),  # Quarta coluna
-                ('observacao', row[4]),  # Quinta coluna
-                ('ativa', True),
-                ('oculta', False),
-                ('opcional', row[5]),  # Sexta coluna
-                ('familia_cobertura', row[0])  # Primeira coluna
-            ])
+            documento = {
+                'id': str(uuid.uuid4()),
+                'enunciado': row[2],  # Terceira coluna
+                'tipo': 'DOCUMENTO',
+                'tipo_resposta': 'DOCUMENTO',
+                'descrição_detalhada': row[3],  # Quarta coluna
+                'observacao': row[4],  # Quinta coluna
+                'ativa': True,
+                'oculta': False,
+                'opcional': row[5],  # Sexta coluna
+                'familia_cobertura': row[0]  # Primeira coluna
+            }
             documentos.append(documento)
         
         with open(yaml_filename, mode='w', encoding='utf-8') as yaml_file:
-            yaml.dump({'documentos': documentos}, yaml_file, default_flow_style=False, allow_unicode=True)
+            yaml.dump({'documentos': documentos}, yaml_file, Dumper=NoAliasDumper, default_flow_style=False, allow_unicode=True)
 
 # Exemplo de uso:
 csv_to_yaml('seu_arquivo.csv', 'saida.yaml')
