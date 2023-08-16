@@ -2,10 +2,12 @@ import csv
 import uuid
 import yaml
 
-# Subclasse para manter a ordem de inserção
-class NoAliasDumper(yaml.Dumper):
-    def ignore_aliases(self, data):
-        return True
+# Função personalizada para manter a ordem de inserção e adicionar aspas
+def represent_dict_order(dumper, data):
+    return dumper.represent_mapping('tag:yaml.org,2002:map', data.items())
+
+# Registrar a função personalizada para dicionários
+yaml.add_representer(dict, represent_dict_order)
 
 def csv_to_yaml(csv_filename, yaml_filename):
     with open(csv_filename, mode='r', encoding='utf-8') as csv_file:
@@ -26,13 +28,13 @@ def csv_to_yaml(csv_filename, yaml_filename):
                 'observacao': row[4],  # Quinta coluna
                 'ativa': True,
                 'oculta': False,
-                'opcional': row[5],  # Sexta coluna
+                'opcional': row[5] == 'True',  # Convertendo a string para booleano
                 'familia_cobertura': row[0]  # Primeira coluna
             }
             documentos.append(documento)
         
         with open(yaml_filename, mode='w', encoding='utf-8') as yaml_file:
-            yaml.dump({'documentos': documentos}, yaml_file, Dumper=NoAliasDumper, default_flow_style=False, allow_unicode=True)
+            yaml.dump({'documentos': documentos}, yaml_file, default_flow_style=False, allow_unicode=True)
 
 # Exemplo de uso:
 csv_to_yaml('seu_arquivo.csv', 'saida.yaml')
