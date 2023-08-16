@@ -28,7 +28,7 @@ def csv_to_yaml(csv_filename, yaml_filename):
                 'observacao': row[4],  # Quinta coluna
                 'ativa': True,
                 'oculta': False,
-                'opcional': row[5] == 'True',  # Convertendo a string para booleano
+                'opcional': True if row[5].lower() == 'opcional' else False,  # Convertendo a string para booleano
                 'familia_cobertura': row[0]  # Primeira coluna
             }
             documentos.append(documento)
