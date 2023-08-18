@@ -1,1 +1,54 @@
-https://excalidraw.com/#room=e53290806def8e12dad6,Bb1UAwJO2e5p-xQOM-oZTQ
+import csv
+import uuid
+import yaml
+
+# Função personalizada para manter a ordem de inserção e adicionar aspas
+def represent_dict_order(dumper, data):
+    return dumper.represent_mapping('tag:yaml.org,2002:map', data.items(), flow_style=False)
+
+# Função personalizada para evitar quebras de linha em strings longas
+def represent_str(dumper, data):
+    if len(data.splitlines()) > 1:  # verifica se há múltiplas linhas
+        return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+    return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+
+# Registrar as funções personalizadas
+yaml.add_representer(dict, represent_dict_order)
+yaml.add_representer(str, represent_str)
+
+def csv_to_yaml(csv_filename, yaml_filename):
+    with open(csv_filename, mode='r', encoding='utf-8') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=';')  # Especificando o delimitador
+        
+        # Pular o cabeçalho
+        next(csv_reader)
+        
+        # Dicionário para agrupar os ids de familia_cobertura por enunciado
+        agrupados = {}
+        
+        for row in csv_reader:
+            enunciado = row[2]
+            if enunciado not in agrupados:
+                agrupados[enunciado] = {
+                    'id': str(uuid.uuid4()),
+                    'enunciado': enunciado,
+                    'tipo': 'DOCUMENTO',
+                    'tipo_resposta': 'DOCUMENTO',
+                    'descrição_detalhada': row[3],  # Quarta coluna
+                    'observacao': row[4],  # Quinta coluna
+                    'ativa': True,
+                    'oculta': False,
+                    'opcional': True if row[5].lower() == 'opcional' else False,  # Convertendo a string para booleano
+                    'marcadores': row[1],  # Segunda coluna
+                    'id_familia_cobertura': []
+                }
+            agrupados[enunciado]['id_familia_cobertura'].append(str(uuid.uuid4()))
+        
+        # Convertendo o dicionário agrupado em uma lista
+        documentos = list(agrupados.values())
+        
+        with open(yaml_filename, mode='w', encoding='utf-8') as yaml_file:
+            yaml.dump({'documentos': documentos}, yaml_file, default_flow_style=False, allow_unicode=True)
+
+# Exemplo de uso:
+csv_to_yaml('seu_arquivo.csv', 'saida.yaml')
