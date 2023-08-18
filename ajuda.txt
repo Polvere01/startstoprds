@@ -28,6 +28,11 @@ def csv_to_yaml(csv_filename, yaml_filename):
         
         for row in csv_reader:
             enunciado = row[2]
+            familia_cobertura_item = {
+                'id': row[0],
+                'opcional': True if row[5].lower() == 'opcional' else False
+            }
+            
             if enunciado not in agrupados:
                 agrupados[enunciado] = {
                     'id': str(uuid.uuid4()),
@@ -38,11 +43,10 @@ def csv_to_yaml(csv_filename, yaml_filename):
                     'observacao': row[4],  # Quinta coluna
                     'ativa': True,
                     'oculta': False,
-                    'opcional': True if row[5].lower() == 'opcional' else False,  # Convertendo a string para booleano
                     'marcadores': row[1],  # Segunda coluna
                     'id_familia_cobertura': []
                 }
-            agrupados[enunciado]['id_familia_cobertura'].append(str(uuid.uuid4()))
+            agrupados[enunciado]['id_familia_cobertura'].append(familia_cobertura_item)
         
         # Convertendo o dicionário agrupado em uma lista
         documentos = list(agrupados.values())
