@@ -2,57 +2,48 @@ import csv
 import uuid
 import yaml
 
-# Função personalizada para manter a ordem de inserção e adicionar aspas
 def represent_dict_order(dumper, data):
     return dumper.represent_mapping('tag:yaml.org,2002:map', data.items(), flow_style=False)
 
-# Função personalizada para evitar quebras de linha em strings longas
 def represent_str(dumper, data):
-    if len(data.splitlines()) > 1:  # verifica se há múltiplas linhas
+    if len(data.splitlines()) > 1:
         return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
     return dumper.represent_scalar('tag:yaml.org,2002:str', data)
 
-# Registrar as funções personalizadas
 yaml.add_representer(dict, represent_dict_order)
 yaml.add_representer(str, represent_str)
 
 def csv_to_yaml(csv_filename, yaml_filename):
     with open(csv_filename, mode='r', encoding='utf-8') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=';')  # Especificando o delimitador
+        csv_reader = csv.reader(csv_file, delimiter=';')
         
-        # Pular o cabeçalho
-        next(csv_reader)
+        next(csv_reader)  # Pular o cabeçalho
         
-        # Dicionário para agrupar os documentos por familia_cobertura
-        agrupados = {}
+        familias = {}
         
         for row in csv_reader:
             documento = {
                 'id': str(uuid.uuid4()),
-                'enunciado': row[2],  # Terceira coluna
-                'descricao_detalhada': row[3],  # Quarta coluna
-                'observacao': row[4],  # Quinta coluna
-                'opcional': True if row[5].lower() == 'opcional' else False  # Convertendo a string para booleano
+                'enunciado': row[2],
+                'descricao_detalhada': row[3],
+                'observacao': row[4],
+                'opcional': True if row[5].lower() == 'opcional' else False
             }
             
-            familia_cobertura_id = row[0]
+            familia_id = row[0]
             marcador = row[1]
             
-            if familia_cobertura_id not in agrupados:
-                agrupados[familia_cobertura_id] = {
-                    'familia_cobertura': {
-                        'id': familia_cobertura_id,
-                        'marcador': marcador,
-                        'documento': []
-                    }
+            if familia_id not in familias:
+                familias[familia_id] = {
+                    'id': familia_id,
+                    'marcador': marcador,
+                    'documento': []
                 }
-            agrupados[familia_cobertura_id]['familia_cobertura']['documento'].append(documento)
+            familias[familia_id]['documento'].append(documento)
         
-        # Convertendo o dicionário agrupado em uma lista
-        documentos_familia_cobertura = [value for key, value in agrupados.items()]
+        documentos = {'documentos': {'familia': list(familias.values())}}
         
         with open(yaml_filename, mode='w', encoding='utf-8') as yaml_file:
-            yaml.dump({'documento_familia_cobertura': documentos_familia_cobertura}, yaml_file, default_flow_style=False, allow_unicode=True)
+            yaml.dump(documentos, yaml_file, default_flow_style=False, allow_unicode=True)
 
-# Exemplo de uso:
-csv_to_yaml('documento.csv', 'saida.yaml')
+csv_to_yaml('seu_arquivo.csv', 'saida.yaml')
