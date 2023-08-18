@@ -23,36 +23,36 @@ def csv_to_yaml(csv_filename, yaml_filename):
         # Pular o cabeçalho
         next(csv_reader)
         
-        # Dicionário para agrupar os ids de familia_cobertura por enunciado
+        # Dicionário para agrupar os documentos por familia_cobertura
         agrupados = {}
         
         for row in csv_reader:
-            enunciado = row[2]
-            familia_cobertura_item = {
-                'id': row[0],
-                'opcional': True if row[5].lower() == 'opcional' else False
+            documento = {
+                'id': str(uuid.uuid4()),
+                'enunciado': row[2],  # Terceira coluna
+                'descricao_detalhada': row[3],  # Quarta coluna
+                'observacao': row[4],  # Quinta coluna
+                'opcional': True if row[5].lower() == 'opcional' else False  # Convertendo a string para booleano
             }
             
-            if enunciado not in agrupados:
-                agrupados[enunciado] = {
-                    'id': str(uuid.uuid4()),
-                    'enunciado': enunciado,
-                    'tipo': 'DOCUMENTO',
-                    'tipo_resposta': 'DOCUMENTO',
-                    'descrição_detalhada': row[3],  # Quarta coluna
-                    'observacao': row[4],  # Quinta coluna
-                    'ativa': True,
-                    'oculta': False,
-                    'marcadores': row[1],  # Segunda coluna
-                    'id_familia_cobertura': []
+            familia_cobertura_id = row[0]
+            marcador = row[1]
+            
+            if familia_cobertura_id not in agrupados:
+                agrupados[familia_cobertura_id] = {
+                    'familia_cobertura': {
+                        'id': familia_cobertura_id,
+                        'marcador': marcador,
+                        'documento': []
+                    }
                 }
-            agrupados[enunciado]['id_familia_cobertura'].append(familia_cobertura_item)
+            agrupados[familia_cobertura_id]['familia_cobertura']['documento'].append(documento)
         
         # Convertendo o dicionário agrupado em uma lista
-        documentos = list(agrupados.values())
+        documentos_familia_cobertura = [value for key, value in agrupados.items()]
         
         with open(yaml_filename, mode='w', encoding='utf-8') as yaml_file:
-            yaml.dump({'documentos': documentos}, yaml_file, default_flow_style=False, allow_unicode=True)
+            yaml.dump({'documento_familia_cobertura': documentos_familia_cobertura}, yaml_file, default_flow_style=False, allow_unicode=True)
 
 # Exemplo de uso:
-csv_to_yaml('seu_arquivo.csv', 'saida.yaml')
+csv_to_yaml('documento.csv', 'saida.yaml')
