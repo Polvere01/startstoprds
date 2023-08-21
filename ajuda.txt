@@ -22,7 +22,13 @@ def csv_to_yaml(csv_filename, yaml_filename):
         familias = {}
         
         for row in csv_reader:
-            tipo_documento = 0 if row[7].lower() == "criar" else int(row[7])
+            if row[7].lower() == "criar":
+                tipo_documento = 0
+            else:
+                try:
+                    tipo_documento = int(row[7])
+                except ValueError:
+                    tipo_documento = 0  # ou qualquer valor padrão que você queira usar para casos inválidos
             
             documento = {
                 'id': str(uuid.uuid4()),
