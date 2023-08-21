@@ -22,12 +22,15 @@ def csv_to_yaml(csv_filename, yaml_filename):
         familias = {}
         
         for row in csv_reader:
+            tipo_documento = 0 if row[7].lower() == "criar" else int(row[7])
+            
             documento = {
                 'id': str(uuid.uuid4()),
                 'enunciado': row[2],
-                'descricao_detalhada': row[3],
+                'descricao': row[3],
                 'observacao': row[4],
-                'opcional': True if row[5].lower() == 'opcional' else False
+                'opcional': True if row[5].lower() == 'opcional' else False,
+                'tipo_documento': tipo_documento
             }
             
             familia_id = row[0]
