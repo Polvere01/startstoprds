@@ -1,34 +1,47 @@
-import os
-import zipfile
-import glob
+import csv
+import uuid
+import yaml
 
-def distribute_txt_to_others(input_dir):
-    # Detecta o arquivo com o padrão *_D_1.zip
-    source_zip_list = glob.glob(os.path.join(input_dir, "*_D_1.zip"))
-    if not source_zip_list:
-        print("Arquivo *_D_1.zip não encontrado.")
-        return
+def represent_dict_order(dumper, data):
+    return dumper.represent_mapping('tag:yaml.org,2002:map', data.items(), flow_style=False)
 
-    source_zip = source_zip_list[0]
+def represent_str(dumper, data):
+    if len(data.splitlines()) > 1:
+        return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+    return dumper.represent_scalar('tag:yaml.org,2002:str', data)
 
-    # Extrair o .txt de *_D_1.zip
-    with zipfile.ZipFile(source_zip, 'r') as zip_ref:
-        # Assumindo que só há um .txt dentro de *_D_1.zip
-        txt_file = [name for name in zip_ref.namelist() if name.endswith('.txt')][0]
-        zip_ref.extract(txt_file, input_dir)
-        txt_path = os.path.join(input_dir, txt_file)
+yaml.add_representer(dict, represent_dict_order)
+yaml.add_representer(str, represent_str)
 
-    # Iterar pelos outros arquivos .zip e adicionar o .txt
-    for i in range(2, 10):  # De *_D_2.zip a *_D_9.zip
-        prefix = os.path.basename(source_zip).rsplit('_D_1.zip', 1)[0]
-        target_zip_path = os.path.join(input_dir, f"{prefix}_D_{i}.zip")
-        if os.path.exists(target_zip_path):
-            with zipfile.ZipFile(target_zip_path, 'a') as zipf:  # 'a' para adicionar sem remover conteúdo existente
-                zipf.write(txt_path, os.path.basename(txt_path))
+def csv_to_yaml(csv_filename, yaml_filename):
+    with open(csv_filename, mode='r', encoding='utf-8') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=';')
+        
+        next(csv_reader)  # Pular o cabeçalho
+        
+        documentos = {}
+        
+        for row in csv_reader:
+            tipo_documento = 0 if row[7].lower() == "criar" else int(row[7])
+            
+            documento_id = str(uuid.uuid4())
+            familia = {
+                'id-familia': row[0],
+                'opcional': True if row[5].lower() == 'opcional' else False
+            }
+            
+            if documento_id not in documentos:
+                documentos[documento_id] = {
+                    'id': documento_id,
+                    'enunciado': row[2],
+                    'descricao': row[3],
+                    'observacao': row[4],
+                    'tipo-documento': tipo_documento,
+                    'familias-coberturas': []
+                }
+            documentos[documento_id]['familias-coberturas'].append(familia)
+        
+        with open(yaml_filename, mode='w', encoding='utf-8') as yaml_file:
+            yaml.dump({'documentos': list(documentos.values())}, yaml_file, default_flow_style=False, allow_unicode=True)
 
-    # Você pode escolher remover o .txt extraído do diretório ou deixá-lo lá
-    # os.remove(txt_path)  # Descomente esta linha se você quiser remover o .txt extraído
-
-if __name__ == "__main__":
-    directory = input("Digite o diretório contendo os arquivos .zip: ")
-    distribute_txt_to_others(directory)
+csv_to_yaml('seu_arquivo.csv', 'saida.yaml')
