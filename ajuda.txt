@@ -4,3 +4,6 @@ try {
 } catch (Exception e) {
     e.printStackTrace();
 }
+Constructor<?> constructor = clazz.getDeclaredConstructor();
+constructor.setAccessible(true);
+Object obj = constructor.newInstance();
