@@ -1,47 +1,14 @@
-import csv
-import uuid
-import yaml
+public class YamlParser {
+    public static void main(String[] args) throws Exception {
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        List<Documento> documentos = mapper.readValue(YamlParser.class.getResourceAsStream("/path_to_your_yaml.yaml"), List.class);
 
-def represent_dict_order(dumper, data):
-    return dumper.represent_mapping('tag:yaml.org,2002:map', data.items(), flow_style=False)
+        Map<String, List<Documento>> familiaToDocumentos = documentos.stream()
+                .flatMap(doc -> doc.getFamiliasCoberturas().stream()
+                        .map(familia -> new AbstractMap.SimpleEntry<>(familia.getIdFamilia(), doc)))
+                .collect(Collectors.groupingBy(Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
-def represent_str(dumper, data):
-    if len(data.splitlines()) > 1:
-        return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
-    return dumper.represent_scalar('tag:yaml.org,2002:str', data)
-
-yaml.add_representer(dict, represent_dict_order)
-yaml.add_representer(str, represent_str)
-
-def csv_to_yaml(csv_filename, yaml_filename):
-    with open(csv_filename, mode='r', encoding='utf-8') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=';')
-        
-        next(csv_reader)  # Pular o cabeçalho
-        
-        documentos = {}
-        
-        for row in csv_reader:
-            tipo_documento = 0 if row[7].lower() == "criar" else int(row[7])
-            
-            documento_id = str(uuid.uuid4())
-            familia = {
-                'id-familia': row[0],
-                'opcional': True if row[5].lower() == 'opcional' else False
-            }
-            
-            if documento_id not in documentos:
-                documentos[documento_id] = {
-                    'id': documento_id,
-                    'enunciado': row[2],
-                    'descricao': row[3],
-                    'observacao': row[4],
-                    'tipo-documento': tipo_documento,
-                    'familias-coberturas': []
-                }
-            documentos[documento_id]['familias-coberturas'].append(familia)
-        
-        with open(yaml_filename, mode='w', encoding='utf-8') as yaml_file:
-            yaml.dump({'documentos': list(documentos.values())}, yaml_file, default_flow_style=False, allow_unicode=True)
-
-csv_to_yaml('seu_arquivo.csv', 'saida.yaml')
+        // Now you have a map where each key is a familia ID and the value is a list of documentos associated with that familia.
+    }
+}
