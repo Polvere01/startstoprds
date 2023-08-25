@@ -1,14 +1,6 @@
-public class YamlParser {
-    public static void main(String[] args) throws Exception {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        List<Documento> documentos = mapper.readValue(YamlParser.class.getResourceAsStream("/path_to_your_yaml.yaml"), List.class);
-
-        Map<String, List<Documento>> familiaToDocumentos = documentos.stream()
-                .flatMap(doc -> doc.getFamiliasCoberturas().stream()
-                        .map(familia -> new AbstractMap.SimpleEntry<>(familia.getIdFamilia(), doc)))
-                .collect(Collectors.groupingBy(Map.Entry::getKey,
-                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
-
-        // Now you have a map where each key is a familia ID and the value is a list of documentos associated with that familia.
-    }
+try {
+    Class<?> clazz = Class.forName("MyClass");
+    Object obj = clazz.getDeclaredConstructor().newInstance();
+} catch (Exception e) {
+    e.printStackTrace();
 }
