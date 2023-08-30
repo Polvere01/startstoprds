@@ -1,9 +1,1 @@
-try {
-    Class<?> clazz = Class.forName("MyClass");
-    Object obj = clazz.getDeclaredConstructor().newInstance();
-} catch (Exception e) {
-    e.printStackTrace();
-}
-Constructor<?> constructor = clazz.getDeclaredConstructor();
-constructor.setAccessible(true);
-Object obj = constructor.newInstance();
+"José, nos outros endpoints que interagem com os serviços, geralmente apenas passamos o id_protocolo para o serviço, o que é suficiente para recuperar o protocolo na base de dados. No entanto, para o novo método que estou criando na interface, preciso encontrar um subprotocolo dentro do protocolo, o que requer que eu passe o cnpjParticipante adicionalmente ao id_protocolo. Na sua opinião, seria melhor passar esses dois campos separadamente ou encapsular ambos em um objeto e passar esse objeto para o método? Quais seriam as implicações de cada abordagem em termos de clareza de código, manutenibilidade e performance?"
