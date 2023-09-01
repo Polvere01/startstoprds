@@ -1,1 +1,22 @@
-José, você mencionou que quer adicionar o campo CNPJ no objeto da manufatura, mas esse campo já existe na lista de contratos dentro da manufatura. Você pediu para adicionar este campo adicionalmente porque pode haver casos em que não exista contrato para um determinado protocolo. Neste caso, faz sentido manter o campo CNPJ em ambos os lugares, no objeto da manufatura e na lista de contratos? Isso não seria redundante ou poderia levar a inconsistências se os CNPJs em ambos os lugares forem diferentes? Como devemos lidar com essa situação?"
+import os
+import shutil
+
+# Caminho de origem e destino
+caminho_origem = '/caminho/origem'
+caminho_destino = '/caminho/destino'
+
+# Verifique todos os arquivos no diretório de origem
+for arquivo in os.listdir(caminho_origem):
+    # Verifique se o arquivo tem o prefixo desejado
+    if arquivo.startswith('11094230'):
+        # Construa os caminhos completos de origem e destino
+        origem_completa = os.path.join(caminho_origem, arquivo)
+        destino_completa = os.path.join(caminho_destino, arquivo)
+        
+        # Verifique se o arquivo já existe no diretório de destino
+        if not os.path.exists(destino_completa):
+            # Copie o arquivo para o diretório de destino
+            shutil.copy(origem_completa, caminho_destino)
+            print(f'Arquivo {arquivo} copiado com sucesso!')
+        else:
+            print(f'Arquivo {arquivo} já existe no destino.')
