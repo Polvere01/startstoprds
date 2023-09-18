@@ -1,1 +1,63 @@
-"José, estou utilizando 'stream' para processar os subprotocolos e manufaturas e não estou validando explicitamente a sua existência. Isso pode resultar em 'NullPointerException' se, em algum caso, não houver um subprotocolo ou manufatura. Você pode confirmar se, independentemente do CNPJ, sempre haverá um subprotocolo e uma manufatura associados? Isso me ajudará a entender se preciso adicionar validações extras.
+Claro! Vamos estender a nossa estrutura anterior para criar uma implementação completa para cada tipo de `ResultadoMRI`. 
+
+Primeiro, vamos estabelecer uma estrutura para o `Subprotocolo`. Para simplificar, vou usar alguns campos básicos:
+
+```java
+public class Subprotocolo {
+    private String motivoSituacao;
+    private String descricaoSituacao;
+    private DecisaoMRI decisaoMRI;
+
+    // Getters, setters e outros campos/funcionalidades
+}
+
+public class DecisaoMRI {
+    private String requestId;
+    private Date dataRecebimentoCallback;
+    private ResultadoMRI decisao;
+    private String descricaoDecisao;
+
+    // Getters, setters e outros campos/funcionalidades
+}
+```
+
+Agora, as estratégias:
+
+```java
+public class AprovarMRI implements EstrategiaMRI {
+    @Override
+    public void executar(Subprotocolo subprotocolo, String descricaoDecisao) {
+        subprotocolo.setMotivoSituacao("APROVADO_MRI");
+        subprotocolo.setDescricaoSituacao(descricaoDecisao);
+    }
+}
+
+public class InconclusivoMRI implements EstrategiaMRI {
+    @Override
+    public void executar(Subprotocolo subprotocolo, String descricaoDecisao) {
+        subprotocolo.setMotivoSituacao("INCONCLUSIVO_MRI");
+        subprotocolo.setDescricaoSituacao(descricaoDecisao);
+    }
+}
+
+public class RecusarMRI implements EstrategiaMRI {
+    @Override
+    public void executar(Subprotocolo subprotocolo, String descricaoDecisao) {
+        subprotocolo.setMotivoSituacao("RECUSADO_MRI");
+        subprotocolo.setDescricaoSituacao(descricaoDecisao);
+    }
+}
+
+public class FupMRI implements EstrategiaMRI {
+    @Override
+    public void executar(Subprotocolo subprotocolo, String descricaoDecisao) {
+        subprotocolo.setMotivoSituacao("FUP_MRI");
+        subprotocolo.setDescricaoSituacao(descricaoDecisao);
+        // Aqui você pode adicionar mais lógica específica para atualizar o protocolo e os documentos pendentes
+    }
+}
+```
+
+Lembre-se de que essa é uma implementação simplificada, e há muitos detalhes adicionais que você pode querer adicionar, como a persistência dos dados alterados, tratamento de erros, entre outros.
+
+A abordagem de Estratégia (Strategy) ajuda a separar a lógica de manipulação para cada tipo de resultado em sua própria classe, facilitando a manutenção e extensão no futuro. Se você precisar adicionar mais lógicas ou resultados, basta adicionar novas classes que implementem `EstrategiaMRI` e atualizar o `ServicoMRI` para lidar com eles.
