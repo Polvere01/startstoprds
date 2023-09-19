@@ -21,6 +21,36 @@ public class DecisaoMRI {
 }
 ```
 
+public class ServicoMRI {
+    
+    private final Map<ResultadoMRI, EstrategiaMRI> estrategias = new HashMap<>();
+    private final SubprotocoloService subprotocoloService;
+
+    public ServicoMRI(SubprotocoloService subprotocoloService) {
+        this.subprotocoloService = subprotocoloService;
+
+        estrategias.put(ResultadoMRI.APROVAR, new AprovarMRI());
+        estrategias.put(ResultadoMRI.INCONCLUSIVO, new InconclusivoMRI());
+        estrategias.put(ResultadoMRI.RECUSAR, new RecusarMRI());
+        estrategias.put(ResultadoMRI.FUP, new FupMRI());
+    }
+
+    public void processarResultadoMRI(ResultadoMRI resultadoMRI, Long subprotocoloId, String descricaoDecisao) {
+        Subprotocolo subprotocolo = subprotocoloService.buscarPorId(subprotocoloId);
+        if (subprotocolo == null) {
+            throw new IllegalArgumentException("Subprotocolo com ID " + subprotocoloId + " não encontrado.");
+        }
+
+        EstrategiaMRI estrategia = estrategias.get(resultadoMRI);
+        if (estrategia != null) {
+            estrategia.executar(subprotocolo, descricaoDecisao);
+            // Se você precisar persistir mudanças no Subprotocolo, faça-o aqui.
+        } else {
+            throw new IllegalArgumentException("Resultado MRI não suportado: " + resultadoMRI);
+        }
+    }
+}
+
 Agora, as estratégias:
 
 ```java
