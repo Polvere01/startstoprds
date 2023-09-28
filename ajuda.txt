@@ -1,1 +1,24 @@
-Estava pensando sobre o fluxo de desenvolvimento do front-end e fiquei curioso: quando você está trabalhando em funcionalidades que dependem de APIs que ainda não foram implementadas, como você lida com isso? Você utiliza alguma ferramenta ou método específico para simular ou "mockar" essas APIs?
+import os
+import pandas as pd
+
+def obter_arquivos_excel(caminho_excel, coluna='A'):
+    """Retorna uma lista de nomes de arquivos de uma planilha Excel."""
+    df = pd.read_excel(caminho_excel)
+    return df[coluna].dropna().tolist()
+
+def obter_arquivos_pasta(caminho_pasta):
+    """Retorna uma lista de nomes de arquivos de uma pasta."""
+    return os.listdir(caminho_pasta)
+
+def arquivos_faltando_na_pasta(caminho_excel, caminho_pasta, coluna_excel='A'):
+    arquivos_excel = set(obter_arquivos_excel(caminho_excel, coluna_excel))
+    arquivos_pasta = set(obter_arquivos_pasta(caminho_pasta))
+
+    return arquivos_excel - arquivos_pasta
+
+caminho_excel = "caminho/para/seu/arquivo.xlsx"
+caminho_pasta = "caminho/para/sua/pasta"
+
+faltando_na_pasta = arquivos_faltando_na_pasta(caminho_excel, caminho_pasta)
+
+print("Arquivos listados no Excel que estão faltando na pasta:", faltando_na_pasta)
