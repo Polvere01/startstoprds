@@ -1,6 +1,18 @@
 import os
 import pandas as pd
 
+def copiar_pasta(origem, destino):
+    """Copia o conteúdo de uma pasta para outra."""
+    if not os.path.exists(destino):
+        os.makedirs(destino)
+    for item in os.listdir(origem):
+        s = os.path.join(origem, item)
+        d = os.path.join(destino, item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d, False, None)
+        else:
+            shutil.copy2(s, d)
+
 def obter_arquivos_excel(caminho_excel, coluna='A'):
     """Retorna uma lista de nomes de arquivos de uma planilha Excel."""
     df = pd.read_excel(caminho_excel)
